@@ -1,7 +1,4 @@
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class Food extends Item{
     private int amount;
@@ -29,12 +26,13 @@ public class App {
     }
 
     public String bestCharge(List<String> inputs) {
-        String res_str = "";
+
         List<Item> item_list = this.itemRepository.findAll();
-        List<SalesPromotion> sales_promotion_list = this.salesPromotionRepository.findAll();
 
         Map<String, Food> order = new HashMap<>();
-        double total_price = 0;
+
+        double total_price = 0.0d;
+        String res_str = "";
         res_str += "============= Order details =============\n";
 
         for (String tmp: inputs){
@@ -54,10 +52,27 @@ public class App {
             }
         }
         res_str += "-----------------------------------\n";
-        System.out.println(res_str);
+//        System.out.println(res_str);
 
-        
-
+        List<SalesPromotion> sales_promotion_list = this.salesPromotionRepository.findAll();
+        List<String> discount_items = new ArrayList<>();
+        double discount_price = 0.0d;
+        for (String tmp2: inputs){
+            String[] tmp_food2= tmp2.split(" x ");
+            String tmp_id2 = tmp_food2[0];
+            for (SalesPromotion sales_promotion: sales_promotion_list){
+                if (sales_promotion.getType().equals("50%_DISCOUNT_ON_SPECIFIED_ITEMS")){
+                    for (String related_item: sales_promotion.getRelatedItems()){
+                        if (related_item.equals(tmp_id2)){
+                            Food food2 = order.get(related_item);
+                            discount_items.add(food2.getName());
+                            discount_price += food2.getPrice()*food2.getAmount()/2;
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("000");
         return null;
     }
 }
